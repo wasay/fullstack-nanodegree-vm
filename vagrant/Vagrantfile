@@ -4,10 +4,37 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.provision "shell", path: "pg_config.sh"
-  # config.vm.box = "hashicorp/precise32"
-  config.vm.box = "ubuntu/trusty32"
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.network "forwarded_port", guest: 8080, host: 8080
-  config.vm.network "forwarded_port", guest: 5000, host: 5000
+
+	# Every Vagrant virtual environment requires a box to build off of.
+
+	#Hyper-V Box settings
+	config.vm.box = "hashicorp/precise64"
+	config.vm.provider "hyperv"""
+
+	#Virtual Box settings
+	#config.vm.box = "hashicorp/precise32"
+
+	config.ssh.username = 'vagrant'
+	config.ssh.password = 'vagrant'
+	config.ssh.insert_key = 'true'
+
+	#office network
+	#config.vm.synced_folder ".", "/vagrant", rsync__exclude: ".git/"
+
+	#home network
+	config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
+
+	# Create a forwarded port mapping which allows access to a specific port
+	# within the machine from a port on the host machine. In the example below,
+	# accessing "localhost:8080" will access port 80 on the guest machine.
+	config.vm.network :forwarded_port, guest: 80, host: 8080
+	config.vm.network :forwarded_port, guest: 5985, host: 5985
+	config.vm.network :forwarded_port, guest: 1433, host: 1433
+
+	config.vm.network "forwarded_port", guest: 8000, host: 8000
+	config.vm.network "forwarded_port", guest: 8080, host: 8080
+	config.vm.network "forwarded_port", guest: 5000, host: 5000
+
+	#config.vm.provision "shell", path: "pg_config.sh"
+	config.vm.provision :shell, :path => "pg_config.sh"
 end

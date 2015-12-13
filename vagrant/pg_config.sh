@@ -14,6 +14,7 @@ su postgres -c 'createuser -dRS vagrant'
 su vagrant -c 'createdb'
 su vagrant -c 'createdb forum'
 su vagrant -c 'psql forum -f /vagrant/forum/forum.sql'
+su vagrant -c 'psql -f /vagrant/tournament/tournament.sql'
 
 vagrantTip="[35m[1mThe shared directory is located at /vagrant\nTo access your shared files: cd /vagrant(B[m"
 echo -e $vagrantTip > /etc/motd
@@ -21,5 +22,8 @@ echo -e $vagrantTip > /etc/motd
 wget http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
+echo "call make"
 make
+echo "call make install"
 make install
+echo "end of file"
