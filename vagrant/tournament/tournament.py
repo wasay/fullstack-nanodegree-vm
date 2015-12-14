@@ -218,7 +218,9 @@ def swissPairings():
 
 try:
     connect()
+
+    """ Call to createTournament() is optional """
     createTournament('Tournament')
-    print "Start Tournament"
+
 except ValueError, Argument:
         print "Initialization issue.", Argument
