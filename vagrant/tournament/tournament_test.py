@@ -8,11 +8,6 @@ from tournament import *
 """run this with -- python tournament_test.py"""
 
 
-def testStartTournament():
-    createTournament('Tournament')
-    print "Start Tournament"
-
-
 def testDeleteMatches():
     deleteMatches()
     print "1. Old matches can be deleted."
@@ -137,7 +132,6 @@ def testPairings():
 
 
 if __name__ == '__main__':
-    testStartTournament()
     testDeleteMatches()
     testDelete()
     testCount()

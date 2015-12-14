@@ -5,6 +5,9 @@
 
 import psycopg2
 
+""" Default tournament id assigned"""
+tournament_id = 1
+
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -18,7 +21,7 @@ def connect():
 
     except ValueError, Argument:
         print "I am unable to connect to the database.", Argument
-    '''print conn'''
+
     return conn
 
 
@@ -29,11 +32,10 @@ def createTournament(name):
     global tournament_id
 
     try:
-        connect()
         dbcur.execute("""SELECT tournament_id FROM tournaments""")
 
         query = """INSERT INTO tournaments(tournament_name) VALUES('%s');"""
-        """print query"""
+
         dbcur.execute(query % (name))
         conn.commit()
     except ValueError, Argument:
@@ -83,7 +85,7 @@ def registerPlayer(name):
     global tournament_id
 
     query = """INSERT INTO players(player_name) VALUES($$%s$$);"""
-    '''print query'''
+
     dbcur.execute(query % (name))
     conn.commit()
 
@@ -92,20 +94,22 @@ def registerPlayer(name):
     player_id = dbcur.fetchone()
 
     """Convert tuple value to integer"""
+    '''print """Tournament ID: %s""" % (tournament_id)'''
     tournament_id = str(tournament_id)
     tournament_id = filter(str.isdigit, tournament_id)
+    '''print """Tournament ID: %s""" % (tournament_id)'''
 
     """Convert tuple value to integer"""
+    '''print """Player ID: %s""" % (player_id)'''
     player_id = str(player_id)
     player_id = filter(str.isdigit, player_id)
+    '''print """Player ID: %s""" % (player_id)'''
 
-    '''print """registerPlayer PlayerID: %s, TournamentID: %s" % """
-    """(player_id, tournament_id)""" '''
-
-    query = """INSERT INTO tournament_players(player_id, tournament_id) """
-    """VALUES(%s, %s);"""
+    query = """INSERT INTO tournament_players(player_id, tournament_id)
+    VALUES(%s, %s);""" % (player_id, tournament_id)
     '''print query'''
-    dbcur.execute(query % (player_id, tournament_id))
+
+    dbcur.execute(query)
     conn.commit()
 
 
@@ -126,33 +130,17 @@ def playerStandings():
 
     query = """
         SELECT
-            players.player_id as id,
-            players.player_name as name,
-            coalesce((
-                select sum(score)
-                from standings
-                where
-                    standings.player_id = players.player_id
-                group by standings.player_id
-            ),0) as wins,
-            coalesce((
-                select count(match_id)
-                from standings
-                where
-                    standings.player_id = players.player_id
-                group by standings.player_id
-            ),0) as matches
+            id,
+            name,
+            wins,
+            matches
         FROM
-            players
-        LEFT JOIN
-            tournament_players
-        ON
-            tournament_players.player_id = players.player_id
+            standings_view
         WHERE
-            tournament_players.tournament_id = %s;
-    """
-    '''print query'''
-    dbcur.execute(query % (tournament_id))
+            tournament_id = %s;
+    """ % (tournament_id)
+
+    dbcur.execute(query)
     result = dbcur.fetchall()
     return result
 
@@ -166,31 +154,11 @@ def reportMatch(winner, loser):
     """
     global tournament_id
 
-    '''print """Tournament: %s""", tournament_id
-    print """Winner: %s""", winner
-    print """Loser: %s""", loser
-    '''
+    query = """INSERT INTO matches(tournament_id, player_id_winner, player_id_loser)
+    VALUES(%s, %s, %s);""" % (tournament_id, winner, loser)
 
-    query = "INSERT INTO matches(tournament_id) VALUES(%s);"
-    '''print query'''
-    dbcur.execute(query % (tournament_id))
+    dbcur.execute(query)
     conn.commit()
-
-    """Retrieve generated ID (just one of the possible options)"""
-    dbcur.execute("SELECT LASTVAL()")
-    match_id = dbcur.fetchone()
-    '''print "Match ID: %s" % (match_id) '''
-
-    """Record winner and loser player id"""
-    '''print "Standings First" '''
-    query = """INSERT INTO standings (match_id, player_id, score)
-    VALUES (%s, %s, %s)"""
-    dbcur.execute(query, (match_id, winner, 1))
-
-    '''print "Standings Second"'''
-    query = """INSERT INTO standings (match_id, player_id, score)
-    VALUES (%s, %s, %s)"""
-    dbcur.execute(query, (match_id, loser, 0))
 
     conn.commit()
 
@@ -214,30 +182,21 @@ def swissPairings():
 
     query = """
     SELECT
-        standings.player_id, players.player_name,
-        standings.match_id, standings.score
-    FROM standings
-    LEFT JOIN matches
-    ON matches.match_id = standings.match_id
-    LEFT JOIN players
-    ON players.player_id = standings.player_id
-    WHERE matches.tournament_id = %s
-    ORDER BY score DESC """
+        id, name,
+        match_id, wins
+    FROM standings_view
+    WHERE standings_view.tournament_id = %s
+    ORDER BY wins DESC """ % (tournament_id)
 
-    dbcur.execute(query % (tournament_id))
+    dbcur.execute(query)
     standings = dbcur.fetchall()
 
     row = 0
     counter = 0
 
-    '''print "Standings: %s", (standings)'''
-
     result = [1, 3]
-    '''print "Result: %s", (result)'''
 
     for (i, n, m, s) in standings:
-
-        '''print "row %s" % (row)'''
 
         if counter % 2 == 0:
             item = []
@@ -246,7 +205,7 @@ def swissPairings():
 
         item.append(i)
         item.append(n)
-        '''print "item: %s", (item)'''
+
         result[row] = item
 
         counter += 1
@@ -254,6 +213,12 @@ def swissPairings():
         if counter % 2 == 0:
             row += 1
 
-    '''print "Result: %s", (result)'''
-
     return result
+
+
+try:
+    connect()
+    createTournament('Tournament')
+    print "Start Tournament"
+except ValueError, Argument:
+        print "Initialization issue.", Argument
