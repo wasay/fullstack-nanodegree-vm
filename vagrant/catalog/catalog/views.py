@@ -150,7 +150,7 @@ def showLogin():
                     for x in xrange(32))
     login_session['state'] = state
     # return "The current session state is %s" % login_session['state']
-    return render_template('login.html', STATE=state)
+    return render_template('login.html', STATE=state, CLIENT_ID=CLIENT_ID)
 
 @app.route('/logout')
 def showLogout():
