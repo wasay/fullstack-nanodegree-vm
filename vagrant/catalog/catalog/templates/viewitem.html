@@ -22,10 +22,10 @@
 			{% if item.description %}
 				<p><b>Description</b>: {{item.description}}</p>
 			{% endif %}
-			{ % if not login_session or not login_session['access_token'] % }
+			{% if login_session and login_session['access_token'] %}
 				<a href="{{ url_for('editItem', category_name=item.categories.name, item_title=item.title)}}">Edit</a> |
 				<a href="{{ url_for('deleteItem', category_name=item.categories.name, item_title=item.title)}}">Delete</a>
-			{ % endif % }
+			{% endif %}
 		</div>
 	</section>
 </div>
