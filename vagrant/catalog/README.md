@@ -10,5 +10,6 @@ python run.py
 To test Google OAuth 2.0
 Update "client_secrets.json" file under "instance" folder
 
-
-
+JSON Calls:
+/catalog/categories/JSON
+http://localhost:5000/catalog/Soccer/items/JSON

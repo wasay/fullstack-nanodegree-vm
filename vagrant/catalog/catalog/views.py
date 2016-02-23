@@ -35,31 +35,6 @@ session = DBSession()
 PER_PAGE = 20
 
 
-@app.route('/')
-def showHomepage():
-    try:
-        categories = session.query(Categories).order_by('name')
-        items = session.query(Items).order_by('date_created desc')
-    except:
-        flash('Error')
-    return render_template('index.html', categories=categories, items=items)
-
-
-@app.route('/catalog/<category_name>/items')
-def viewCategoryItems(category_name):
-    try:
-        categories = session.query(Categories).order_by('name')
-
-        category = session.query(Categories).filter_by(name=category_name).\
-            one()
-        items = session.query(Items).filter_by(category_id=category.id).\
-            order_by('title')
-
-    except:
-        flash('Error')
-    return render_template('viewcategory.html', categories=categories,
-                           category=category, items=items)
-
 
 @app.route('/catalog/categories/JSON')
 def viewCategoriesJSON():
@@ -86,6 +61,32 @@ def viewCategoryItemsJSON(category_name):
     except:
         flash('Error')
         return redirect(url_for('showHomepage'))
+
+
+@app.route('/')
+def showHomepage():
+    try:
+        categories = session.query(Categories).order_by('name')
+        items = session.query(Items).order_by('date_created desc')
+    except:
+        flash('Error')
+    return render_template('index.html', categories=categories, items=items)
+
+
+@app.route('/catalog/<category_name>/items')
+def viewCategoryItems(category_name):
+    try:
+        categories = session.query(Categories).order_by('name')
+
+        category = session.query(Categories).filter_by(name=category_name).\
+            one()
+        items = session.query(Items).filter_by(category_id=category.id).\
+            order_by('title')
+
+    except:
+        flash('Error')
+    return render_template('viewcategory.html', categories=categories,
+                           category=category, items=items)
 
 
 @app.route('/catalog/<category_name>/<item_title>/')
