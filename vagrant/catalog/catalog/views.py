@@ -13,7 +13,8 @@ from models import Categories, Items
 from forms import ItemForm
 
 from flask import session as login_session
-import random, string
+import random
+import string
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -33,6 +34,7 @@ session = DBSession()
 
 PER_PAGE = 20
 
+
 @app.route('/')
 def showHomepage():
     try:
@@ -42,17 +44,49 @@ def showHomepage():
         flash('Error')
     return render_template('index.html', categories=categories, items=items)
 
+
 @app.route('/catalog/<category_name>/items')
-def viewCategories(category_name):
+def viewCategoryItems(category_name):
     try:
         categories = session.query(Categories).order_by('name')
 
-        category = session.query(Categories).filter_by(name=category_name).one()
-        items = session.query(Items).filter_by(category_id=category.id).order_by('title')
+        category = session.query(Categories).filter_by(name=category_name).\
+            one()
+        items = session.query(Items).filter_by(category_id=category.id).\
+            order_by('title')
 
     except:
         flash('Error')
-    return render_template('viewcategory.html', categories=categories, category=category, items=items)
+    return render_template('viewcategory.html', categories=categories,
+                           category=category, items=items)
+
+
+@app.route('/catalog/categories/JSON')
+def viewCategoriesJSON():
+    try:
+        categories = session.query(Categories).order_by('name')
+
+        return jsonify(Categories=[i.serialize for i in categories])
+    except:
+        flash('Error')
+        return redirect(url_for('showHomepage'))
+
+
+@app.route('/catalog/<category_name>/items/JSON')
+def viewCategoryItemsJSON(category_name):
+    try:
+        categories = session.query(Categories).order_by('name')
+
+        category = session.query(Categories).filter_by(name=category_name).\
+            one()
+        items = session.query(Items).filter_by(category_id=category.id).\
+            order_by('title')
+
+        return jsonify(Items=[i.serialize for i in items])
+    except:
+        flash('Error')
+        return redirect(url_for('showHomepage'))
+
 
 @app.route('/catalog/<category_name>/<item_title>/')
 def viewLatestItems(category_name, item_title):
@@ -63,20 +97,22 @@ def viewLatestItems(category_name, item_title):
         flash('Error')
         return redirect(url_for('showHomepage'))
 
+
 @app.route('/catalog/item/new', methods=['GET', 'POST'])
 def newItem():
     try:
         form = ItemForm()
         form.category_id.choices = [(0, 'Select')]
-        form.category_id.choices += [(category.id, category.name) for category in session.query(Categories).order_by('name')]
+        form.category_id.choices += [(category.id, category.name) for category
+                                     in session.query(Categories).
+                                     order_by('name')]
         print form.errors
 
         if form.validate_on_submit():
             title = form.title.data
             category_id = form.category_id.data
 
-            newItem = Items(title=title,
-                category_id=category_id)
+            newItem = Items(title=title, category_id=category_id)
 
             session.add(newItem)
             session.commit()
@@ -87,9 +123,11 @@ def newItem():
         flash('Error')
     return redirect(url_for('showHomepage'))
 
-@app.route('/catalog/<category_name>/<item_title>/edit', methods=['GET', 'POST'])
+
+@app.route('/catalog/<category_name>/<item_title>/edit',
+           methods=['GET', 'POST'])
 def editItem(category_name, item_title):
-    #try:
+    try:
         item = session.query(Items).filter_by(title=item_title).one()
 
         form = ItemForm(obj=item)
@@ -97,17 +135,17 @@ def editItem(category_name, item_title):
         categories = session.query(Categories).order_by('name')
 
         form.category_id.choices = [(0, 'Select')]
-        form.category_id.choices += [(category.id, category.name) for category in categories]
+        form.category_id.choices += [(category.id, category.name) for
+                                     category in categories]
         print form.errors
 
         if form.validate_on_submit():
-            #form.populate_obj(post)
+            # form.populate_obj(post)
 
             title = form.title.data
             category_id = form.category_id.data
 
-            newItem = Items(title=title,
-                category_id=category_id)
+            newItem = Items(title=title, category_id=category_id)
 
             session.add(newItem)
             session.commit()
@@ -115,16 +153,18 @@ def editItem(category_name, item_title):
             return redirect(url_for('showHomepage'))
         else:
             return render_template('edititem.html', form=form, item=item)
-    #except:
-    #    flash('Error')
+    except:
+        flash('Error')
         return redirect(url_for('showHomepage'))
 
-@app.route('/catalog/<category_name>/<item_title>/delete', methods=['GET', 'POST'])
+
+@app.route('/catalog/<category_name>/<item_title>/delete',
+           methods=['GET', 'POST'])
 def deleteItem(category_name, item_title):
 
     item = session.query(Items).filter_by(title=item_title).one()
 
-    if item :
+    if item:
 
         if request.method == 'POST':
             session.delete(item)
@@ -139,10 +179,6 @@ def deleteItem(category_name, item_title):
         return redirect(url_for('showHomepage'))
 
 
-
-
-
-
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -152,9 +188,11 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state, CLIENT_ID=CLIENT_ID)
 
+
 @app.route('/logout')
 def showLogout():
     return redirect(url_for('gdisconnect'))
+
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -207,7 +245,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('''Current user is already
+            connected.'''),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -233,7 +272,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: '
+    output += '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -249,37 +289,37 @@ def gdisconnect():
     print 'User name is: '
     print login_session['username']
     if access_token is None:
- 	print 'Access Token is None'
-    	response = make_response(json.dumps('Current user not connected.'), 401)
-    	response.headers['Content-Type'] = 'application/json'
-    	return response
-	url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
-	h = httplib2.Http()
-	result = h.request(url, 'GET')[0]
-	print 'result is '
-	print result
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'),
+                                 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
-	if result['status'] == '200':
-		del login_session['access_token']
-		del login_session['gplus_id']
-		del login_session['username']
-		del login_session['email']
-		del login_session['picture']
-		response = make_response(json.dumps('Successfully disconnected.'), 200)
-		response.headers['Content-Type'] = 'application/json'
-		return response
-		flash('Successfully disconnected')
-	else:
-		response = make_response(json.dumps('Failed to revoke token for given user.', 400))
-		response.headers['Content-Type'] = 'application/json'
-		return response
-		flash('Failed to revoke token for given user.')
-	return redirect(url_for('showHomepage'))
+    access_token = login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
 
+    if result['status'] == '200':
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+        flash('Successfully disconnected')
+    else:
+        response = make_response(json.dumps('''Failed to revoke token for
+            given user.''', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+        flash('Failed to revoke token for given user.')
+    return redirect(url_for('showHomepage'))
 
-
-#  if 'username' not in login_session:
-#      return redirect('/login')
 
 def url_for_other_page(page):
     args = request.view_args.copy()

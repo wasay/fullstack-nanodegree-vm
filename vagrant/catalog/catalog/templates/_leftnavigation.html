@@ -2,7 +2,7 @@
 	<table style="padding:0px;margin:0px;border:0px;">
 		{% for cat in categories %}
 			<tr>
-				<td><a href="{{ url_for('viewCategories', category_name=cat.name) }}">{{cat.name}}</a></td>
+				<td><a href="{{ url_for('viewCategoryItems', category_name=cat.name) }}">{{cat.name}}</a></td>
 			</tr>
 		{% endfor %}
 	</table>

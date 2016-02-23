@@ -9,7 +9,7 @@
 		<div class="container">
 			<ol class="breadcrumb">
 				<li><a href="{{ url_for('showHomepage') }}">Home</a></li>
-				<li><a href="{{ url_for('viewCategories', category_name=item.categories.name) }}">{{item.categories.name}}</a></li>
+				<li><a href="{{ url_for('viewCategoryItems', category_name=item.categories.name) }}">{{item.categories.name}}</a></li>
 				<li class="active">{{item.title}}</li>
 			</ol>
 			<h1>{{item.title}}</h1>
