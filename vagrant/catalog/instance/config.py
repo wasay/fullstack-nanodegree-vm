@@ -7,5 +7,5 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///itemcatalog.db'
 
 
 
-# client id: # 842680508954-kao591b2ctpg8k88adthkuj2jh5f9nj3.apps.googleusercontent.com
-# sec: q0Ekim7UrsI77RcCd5oYdYi3
+# client id: #  842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.apps.googleusercontent.com
+# sec:  DRJrTMyw2RcD0BX66HkLFcrs
