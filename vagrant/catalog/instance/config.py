@@ -1,8 +1,8 @@
 DEBUG = True
 SQLALCHEMY_ECHO = True
 
-SECRET_KEY = 'some_seckret_key'
-STRIPE_API_KEY = 'some_api_key'
+SECRET_KEY = 'DRJrTMyw2RcD0BX66HkLFcrs'
+STRIPE_API_KEY = '842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.apps.googleusercontent.com'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///itemcatalog.db'
 
 
