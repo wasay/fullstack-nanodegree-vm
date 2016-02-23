@@ -1,0 +1,56 @@
+{% import '_header.html' as header %}
+{% import '_leftnavigation.html' as leftnav %}
+{% import '_footer.html' as footer %}
+{% if header %}
+	{{ header.render_html('Edit Item') }}
+{% endif %}
+<div id="header">
+	<section class="section">
+		<div class="container">
+			<ol class="breadcrumb">
+				<li><a href="{{ url_for('showHomepage') }}">Home</a></li>
+				<li class="active">Edit Item</li>
+			</ol>
+			<h1>Edit Item</h1>
+		</div>
+	</section>
+</div>
+<div id="content">
+	<section class="section">
+		<div class="container">
+			<form method="POST" action="{{url_for('editItem', category_name=item.categories.name, item_title=item.title)}}">
+				{{ form.csrf_token }}
+			    <dl>
+				    <dt>{{ form.title.label }}</dt>
+				    <dd>{{ form.title() }}</dd>
+			    </dl>
+			    {% if form.title.errors %}
+				   <ul class="errors">{% for error in form.title.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+			    {% endif %}
+
+			    <dl>
+				    <dt>{{ form.description.label }}</dt>
+				    <dd>{{ form.description() }}</dd>
+			    </dl>
+			    {% if form.description.errors %}
+				   <ul class="errors">{% for error in form.description.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+			    {% endif %}
+
+			    <dl>
+				    <dt>{{ form.category_id.label }}</dt>
+				    <dd>{{ form.category_id() }}</dd>
+			    </dl>
+			    {% if form.category_id.errors %}
+				   <ul class="errors">{% for error in form.category_id.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+			    {% endif %}
+
+				<div><input type='submit' value='Update'>
+				&nbsp;<input type="button" value="Cancel"
+				onclick="window.location='{{ url_for('showHomepage') }}'"></div>
+			</form>
+		</div>
+	</section>
+</div>
+{% if footer %}
+	{{ footer.render_html() }}
+{% endif %}

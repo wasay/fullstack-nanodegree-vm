@@ -4,4 +4,5 @@ backup
 .idea
 /vagrant/catalog/itemcatalog.db
 /vagrant/catalog/catalog/static/jquery-ui-1.11.4.pepper-grinder
+/vagrant/catalog/instance
 .vagrant

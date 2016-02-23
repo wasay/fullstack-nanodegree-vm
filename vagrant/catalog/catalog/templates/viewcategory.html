@@ -2,7 +2,7 @@
 {% import '_leftnavigation.html' as leftnav %}
 {% import '_footer.html' as footer %}
 {% if header %}
-	{{ header.render_html('Catalog App') }}
+	{{ header.render_html(category.name) }}
 {% endif %}
 <div id="content">
 	<section class="section">
@@ -21,17 +21,12 @@
 					</td>
 					<td style="vertical-align: top;width:1px;background-color:#cccccc;"></td>
 					<td style="vertical-align: top;padding-left:10px;">
-						{% if login_session and login_session['access_token'] %}
-							<a href="{{ url_for('newItem')}}">Add Item</a><br>
-							<br>
-						{% endif %}
+						<b>{{category.name}} Items ({{items.count()}} items)</b><br>
+						<br>
 						<table style="padding:0px;margin:0px;border:0px;">
 							{% for item in items %}
 								<tr>
-									<td>
-									<a href="{{ url_for('viewLatestItems', category_name=item.categories.name, item_title=item.title) }}">{{item.title}}</a>
-									<i>({{item.categories.name}})</i>
-									</td>
+									<td><a href="{{ url_for('viewLatestItems', category_name=item.categories.name, item_title=item.title) }}">{{item.title}}</a></td>
 								</tr>
 							{% endfor %}
 						</table>
