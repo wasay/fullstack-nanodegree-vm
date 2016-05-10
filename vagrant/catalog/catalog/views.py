@@ -53,6 +53,13 @@ def showHomepage():
 
 @app.route('/catalog/<category_name>/items')
 def viewCategoryItems(category_name):
+    """
+    viewCategoryItems: display items related to category name
+    Args:
+        category_name (data type: str): category name to filter items
+    Returns:
+        return view of items for the category
+    """
     try:
         categories = session.query(Categories).order_by('name')
 

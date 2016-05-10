@@ -46,7 +46,7 @@ def showLogin():
 
 
 # ######################################
-# FB and Google Authentication
+# Authentication
 # ######################################
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
