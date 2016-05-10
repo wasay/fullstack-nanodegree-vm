@@ -1,12 +1,14 @@
-{% import '_header.html' as header %}
-{% import '_leftnavigation.html' as leftnav %}
-{% import '_footer.html' as footer %}
-{% if header %}
-	{{ header.render_html('Catalog App') }}
-{% endif %}
-<div id="content">
-	<section class="section">
-		<div class="container">
+{% extends "template.html" %}
+{% import 'left_nav.html' as leftnav %}
+{% block head %}
+	<title>Catalog App</title>
+{% endblock %}
+{% block content %}
+	{% include "header.html" %}
+
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10">
 			<table style="padding:0px;margin:0px;border:0px;">
 				<tr>
 					<td style="vertical-align: top;padding-right:10px;"><h3>Categories</h3></td>
@@ -39,8 +41,6 @@
 				</tr>
 			</table>
 		</div>
-	</section>
-</div>
-{% if footer %}
-	{{ footer.render_html() }}
-{% endif %}
+		<div class="col-md-1"></div>
+	</div>
+{% endblock %}

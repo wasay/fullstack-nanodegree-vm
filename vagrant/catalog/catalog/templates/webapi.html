@@ -1,0 +1,101 @@
+{% extends "template.html" %}
+{% block content %}
+	{% include "header.html" %}
+
+	<div class="row divider green">
+		<div class="col-md-12"></div>
+	</div>
+
+	<div class="row banner menu">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>Web API</h1>
+		</div>
+	</div>
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+
+		</div>
+		<div class="col-md-7"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+					<ul>
+						{% for message in messages %}
+							 <li> <strong> {{ message }} </strong> </li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endwith %}
+		</div>
+	</div>
+
+	<a href="/catalog/categories/JSON/">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-list">
+					<h3>/catalog/categories/JSON/</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+
+	<a href="/catalog/Soccer/JSON">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-list">
+					<h3>/catalog/Soccer/JSON</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+
+	<!--
+
+	<div class="row">
+		<div class="col-md-12">&nbsp;</div>
+	</div>
+
+	<a href="/catalog/categories/ATOM">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-list">
+					<h3>/catalog/categories/ATOM</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+
+	<div class="row">
+		<div class="col-md-12">&nbsp;</div>
+	</div>
+
+	<a href="/catalog/categories/XML">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-list">
+					<h3>/catalog/categories/XML</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+
+	<div class="row">
+		<div class="col-md-12">&nbsp;</div>
+	</div>
+
+	<a href="/catalog/categories/RSS">
+		<div class="row">
+			<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-list">
+					<h3>/catalog/categories/RSS</h3>
+				</div>
+			<div class="col-md-1"></div>
+		</div>
+	</a>
+
+	-->
+
+{% endblock %}

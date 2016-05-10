@@ -1,15 +1,27 @@
-To run this app:
-python run.py
+To run this final project
 
-To initilize data run
-sqlite >> init_data.sql
+1. Navigate to the full_stack_foundations_vm/catalog directory inside the vagrant environment
 
-To test with populated data
-python run.py
+2. run catalog/models.py to create the database
 
-To test Google OAuth 2.0
-Update "client_secrets.json" file under "instance" folder
+3. run catalog/fake_data.py to populate the database
+
+4. run app.py and navigate to localhost:5000 in your browser
+
+
 
 JSON Calls:
 /catalog/categories/JSON
 http://localhost:5000/catalog/Soccer/items/JSON
+
+RSS Calls:
+/catalog/categories/JSON
+http://localhost:5000/catalog/Soccer/items/RSS
+
+ATOM Calls:
+/catalog/categories/JSON
+http://localhost:5000/catalog/Soccer/items/ATOM
+
+XML Calls:
+/catalog/categories/XML
+http://localhost:5000/catalog/Soccer/items/XML

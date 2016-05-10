@@ -7,13 +7,24 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 
-from . import app
+# from . import app
 
 Base = declarative_base()
 
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+# engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+engine = create_engine('sqlite:///itemcatalog.db')
+
 
 Base.metadata.create_all(engine)
+
+
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+    picture = Column(String)
 
 
 class Categories(Base):
@@ -39,6 +50,8 @@ class Items(Base):
     categories = relationship(Categories)
     date_created = Column(DateTime, default=datetime.datetime.utcnow)
     date_modified = Column(DateTime, default=datetime.datetime.utcnow)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
@@ -47,8 +60,7 @@ class Items(Base):
             'title': self.title,
             'description': self.description,
             'category_id': self.category_id,
-            'date_created': self.date_created,
-            'date_modified': self.date_modified,
         }
+
 
 Base.metadata.create_all(engine)
