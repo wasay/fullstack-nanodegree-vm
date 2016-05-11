@@ -9,7 +9,7 @@
 	<div class="row">
 		<div class="col-md-1"></div>
 		<div class="col-md-10">
-			<form method="POST" action="{{url_for('editItem', category_name=item.categories.name, item_title=item.title)}}">
+			<form method="POST" action="{{url_for('editItem', category_name=category.name, item_title=item.title)}}">
 				{{ form.csrf_token }}
 			    <dl>
 				    <dt>{{ form.title.label }}</dt>

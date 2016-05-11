@@ -14,8 +14,9 @@ app.config.from_pyfile('config.py')
 
 # import catalog.init_data
 
-import catalog.helper
-import catalog.auth
-import catalog.webapi
-import catalog.forms
-import catalog.views
+
+import catalog
+import forms
+import model
+import views
+import webapi

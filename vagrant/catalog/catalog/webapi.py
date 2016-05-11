@@ -20,7 +20,7 @@ from sqlalchemy.orm import sessionmaker
 
 from models import Base, engine
 
-from models import Categories, Items, User
+from model import Categories, Items, User
 
 Base.metadata.bind = engine
 

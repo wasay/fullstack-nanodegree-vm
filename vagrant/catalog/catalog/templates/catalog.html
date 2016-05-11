@@ -23,7 +23,7 @@
 					</td>
 					<td style="vertical-align: top;width:1px;background-color:#cccccc;"></td>
 					<td style="vertical-align: top;padding-left:10px;">
-						{% if login_session and login_session['access_token'] %}
+						{% if login_session and 'username' in login_session and login_session['access_token'] %}
 							<a href="{{ url_for('newItem')}}">Add Item</a><br>
 							<br>
 						{% endif %}
