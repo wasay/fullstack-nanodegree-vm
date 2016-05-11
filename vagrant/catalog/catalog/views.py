@@ -44,6 +44,14 @@ PER_PAGE = 20
 @app.route('/')
 @app.route('/catalog/')
 def showHomepage():
+    """
+    showHomepage: Homepage of the Catalog application
+    Args:
+        none
+    Returns:
+        return view of homepage
+    """
+
     try:
         categories = session.query(Categories).order_by('name')
         items = session.query(Items).order_by('date_created')
@@ -59,10 +67,11 @@ def viewCategoryItems(category_name):
     """
     viewCategoryItems: display items related to category name
     Args:
-        category_name (data type: str): category name to filter items
+        category_name (data type: str): category name to filter result
     Returns:
         return view of items for the category
     """
+
     try:
         categories = session.query(Categories).order_by('name')
 
@@ -81,6 +90,15 @@ def viewCategoryItems(category_name):
 
 @app.route('/catalog/<category_name>/<item_title>/')
 def viewLatestItems(category_name, item_title):
+    """
+    viewLatestItems: display item details
+    Args:
+        category_name (data type: str): category name to filter result
+        item_title (data type: str): item name to filter result
+    Returns:
+        return view of items for the category
+    """
+
     try:
         categories = session.query(Categories).order_by('name')
 
@@ -111,6 +129,14 @@ def viewLatestItems(category_name, item_title):
 # Route with Method: GET and POST
 @app.route('/catalog/item/new', methods=['GET', 'POST'])
 def newItem():
+    """
+    newItem: form to add a new item
+    Args:
+        none
+    Returns:
+        return add a item and redirect to home or show form to add a new item
+    """
+
     if 'username' not in login_session:
         return redirect('/login')
     try:
@@ -141,6 +167,14 @@ def newItem():
 @app.route('/catalog/<category_name>/<item_title>/edit',
            methods=['GET', 'POST'])
 def editItem(category_name, item_title):
+    """
+    editItem: form to edit a item
+    Args:
+        category_name (data type: str): category name to filter result
+        item_title (data type: str): item name to filter result
+    Returns:
+        return update a item and redirect to home or show form to edit a item
+    """
 
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
@@ -161,12 +195,6 @@ def editItem(category_name, item_title):
 
 
         creator = getUserInfo(editedItem.user_id)
-
-    except:
-        flash('Item Form Error')
-        return redirect(url_for('showHomepage'))
-
-    try:
 
         form = ItemForm(obj=editedItem)
 
@@ -208,6 +236,15 @@ def editItem(category_name, item_title):
 @app.route('/catalog/<category_name>/<item_title>/delete',
            methods=['GET', 'POST'])
 def deleteItem(category_name, item_title):
+    """
+    deleteItem: form to delete a item
+    Args:
+        category_name (data type: str): category name to filter result
+        item_title (data type: str): item name to filter result
+    Returns:
+        return delete a item and redirect to home or show form to confirm a delete item
+    """
+
     if 'username' not in login_session:
         return redirect('/login')
 
@@ -281,6 +318,13 @@ def getUserID(email):
 
 @app.route('/login')
 def showLogin():
+    """
+    showLogin: show login form for authentication
+    Args:
+        none
+    Returns:
+        return view to select a authentication method
+    """
     getReqState()
 
     AMZ_CLIENT_ID = json.loads(open('instance/amz_client_secrets.json', 'r').read())[
@@ -301,6 +345,13 @@ def showLogin():
 # ######################################
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
+    """
+    fbconnect: Facebook Connect Process
+    Args:
+        none
+    Returns:
+        return string to login page json call
+    """
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -375,6 +426,14 @@ def fbconnect():
 
 @app.route('/fbdisconnect')
 def fbdisconnect():
+    """
+    fbdisconnect: Facebook Disconnect Process
+    Args:
+        none
+    Returns:
+        return string that the user is disconnected
+    """
+
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']

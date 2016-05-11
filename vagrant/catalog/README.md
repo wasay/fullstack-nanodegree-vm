@@ -4,7 +4,7 @@ To run this final project
 
 2. run catalog/catalog/model.py to create the database
 
-3. run catalog/catalog/init_data.sql to populate the database
+3. run catalog/catalog/init_data.sql to initialize the database
 
 4. Place client secrets files under catalog/instance folder
    Google: g_client_secrets.json
