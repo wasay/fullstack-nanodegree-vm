@@ -23,7 +23,7 @@ from sqlalchemy import desc
 from model import Base, engine
 from model import Categories, Items, User
 
-from forms import ItemForm
+from forms import CategoryForm, ItemForm
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -141,10 +141,12 @@ def newItem():
         return redirect('/login')
     try:
         form = ItemForm()
+
         form.category_id.choices = [(0, 'Select')]
         form.category_id.choices += [(category.id, category.name) for category
                                      in session.query(Categories).
                                      order_by('name')]
+
         print form.errors
 
         if form.validate_on_submit():
@@ -152,11 +154,16 @@ def newItem():
             category_id = form.category_id.data
             description = form.description.data
 
-            newItem = Items(title=title, description=description, category_id=category_id, user_id=login_session['user_id'])
+            if form.title.data is not None and form.category_id.data is not None and form.category_id.data is not '0':
 
-            session.add(newItem)
-            session.commit()
-            flash("New Item Created")
+                newItem = Items(title=title, description=description, category_id=category_id, user_id=login_session['user_id'])
+
+                session.add(newItem)
+                session.commit()
+                flash("New Item Created")
+
+            else:
+                flash("Missing required information for Add")
         else:
             return render_template('newitem.html', form=form, login_session=login_session)
     except:
@@ -180,57 +187,76 @@ def editItem(category_name, item_title):
         return redirect(url_for('showLogin'))
 
     try:
+
         categories = session.query(Categories).order_by('name')
 
-        category = session.query(Categories).filter_by(name=category_name).\
-            one()
+        category = session.query(Categories).filter_by(name=category_name).one()
 
-        items = session.query(Items).filter_by(category_id=category.id).\
-            order_by('title')
+        if category is None:
+            flash('Error unable to retrive category')
+            return redirect(url_for('showHomepage'))
 
-        editedItem = session.query(Items).filter_by(category_id=category.id, title=item_title).one()
+    except Exception as error:
+        # return '<script>function myFunction(){alert("caught this error-cat: %s");}</script><body onload="myFunction()">' % (repr(error))
 
-        if editedItem.user_id != login_session['user_id']:
-            return "<script>function myFunction() {alert('You are not authorized to edit this menu item. Please create your own menu item in order to edit.');}</script><body onload='myFunction()''>"
+        flash('Error cat')
+        return redirect(url_for('showHomepage'))
 
+    try:
 
-        creator = getUserInfo(editedItem.user_id)
+        item = session.query(Items).filter_by(title=item_title, category_id=category.id).one()
 
-        form = ItemForm(obj=editedItem)
+        if item is None:
+            flash('Error unable to retrive item')
+            return redirect(url_for('showHomepage'))
+
+        item = session.query(Items).filter_by(id=item.id).one()
+
+    except Exception as error:
+        # return '<script>function myFunction(){alert("caught this error-item: %s");}</script><body onload="myFunction()">' % (repr(error))
+
+        flash('Error item')
+        return redirect(url_for('showHomepage'))
+
+    try:
+
+        creator = getUserInfo(item.user_id)
+
+        form = ItemForm(obj=item)
 
         form.category_id.choices = [(0, 'Select')]
-        form.category_id.choices += [(category.id, category.name) for
-                                     category in categories]
+        form.category_id.choices += [(cat.id, cat.name) for
+                                 cat in categories]
+
         print form.errors
 
         if form.validate_on_submit():
+            form.populate_obj(item)
 
-            form.populate_obj(request.form)
+            item.title = form.title.data
+            item.description = form.description.data
+            item.category_id = form.category_id.data
 
-            editedItem.title = form.title.data
-            editedItem.description = form.description.data
-            editedItem.category_id = form.category_id.data
-
-            session.add(editedItem)
+            session.add(item)
             session.commit()
 
-            flash("Item Successfully Edited")
+            flash("Successfully updated item")
             return redirect(url_for('showHomepage'))
 
-        else:
 
-            return render_template('edititem.html',
-                                   categories=categories,
-                                   category=category,
-                                   items=items,
-                                   form=form,
-                                   item=editedItem,
-                                   creator=creator,
-                                   login_session=login_session)
+        return render_template('edititem.html',
+            form=form,
+            categories=categories,
+            category=category,
+            creator=creator,
+            login_session=login_session)
 
-    except:
-        flash('Item Edit Error')
+    except Exception as error:
+        # return '<script>function myFunction(){alert("caught this error-2: %s");}</script><body onload="myFunction()">' % (repr(error))
+
+        flash('Error 2')
         return redirect(url_for('showHomepage'))
+
 
 
 @app.route('/catalog/<category_name>/<item_title>/delete',
@@ -692,6 +718,11 @@ def disconnect():
 # ############################################
 def make_external(url):
     return urljoin(request.url_root, url)
+
+
+# @csrf.error_handler
+# def csrf_error(reason):
+#     return render_template('csrf_error.html', reason=reason)
 
 
 @app.errorhandler(404)
