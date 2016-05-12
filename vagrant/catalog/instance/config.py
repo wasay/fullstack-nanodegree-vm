@@ -6,12 +6,14 @@ DEBUG = True
 SQLALCHEMY_ECHO = True
 
 # SECRET_KEY = 'DRJrTMyw2RcD0BX66HkLFcrs'
-# STRIPE_API_KEY = '842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.apps.googleusercontent.com'
+# STRIPE_API_KEY = '842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.'
+# STRIPE_API_KEY += 'apps.googleusercontent.com'
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///itemcatalog.db'
 
 #  if 'username' not in login_session:
 #      return redirect('/login')
 
-# client id: #  842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.apps.googleusercontent.com
+# client id: #
+#    842680508954-t0nam045ajf4ktvbh5dhe646pqb5prm2.apps.googleusercontent.com
 # sec:  DRJrTMyw2RcD0BX66HkLFcrs

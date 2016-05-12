@@ -1,7 +1,5 @@
 from . import app
 
-#from wtforms_alchemy import ModelForm
-
 from flask.ext.wtf import Form
 
 from wtforms import BooleanField, StringField, validators
@@ -11,14 +9,17 @@ from wtforms.validators import DataRequired, ValidationError
 
 from model import Base, engine, Categories, Items, User
 
-# app.config.from_object(__name__)
+"""
+Define Category Form Class
+"""
+
 
 class CategoryForm(Form):
     name = StringField('Name', [validators.Length(min=2, max=250)])
 
-#class ItemForm(ModelForm):
-#    class Meta:
-#        model = Items
+"""
+Define Item Form Class
+"""
 
 
 class ItemForm(Form):

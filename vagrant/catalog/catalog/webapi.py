@@ -5,8 +5,14 @@ from flask import render_template
 from flask import request, redirect, jsonify
 from flask import url_for, flash
 
-import httplib2, json, requests, random, string
-import pycurl, urllib, StringIO
+import httplib2
+import json
+import requests
+import random
+import string
+import pycurl
+import urllib
+import StringIO
 from pyatom import AtomFeed
 from array import array
 
@@ -27,17 +33,21 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# ######################################
-# JSON APIs to view Restaurant Information
-# ######################################
+"""
+JSON APIs to view Restaurant Information
+"""
+
 
 @app.route('/webapi')
 def showWebApi():
     return render_template('webapi.html', login_session=login_session)
 
-# ######################################
-# Get Categories in JSON Format
-# ######################################
+
+"""
+Get Categories in JSON Format
+"""
+
+
 @app.route('/catalog/categories/JSON/')
 def viewCategoriesJSON():
     try:
@@ -48,9 +58,12 @@ def viewCategoriesJSON():
         flash('Error')
         return redirect(url_for('showHomepage'))
 
-# ######################################
-# Get Categories in ATOM Format
-# ######################################
+
+"""
+Get Categories in ATOM Format
+"""
+
+
 @app.route('/catalog/categories/ATOM')
 def viewCategoriesATOM():
     try:
@@ -61,20 +74,22 @@ def viewCategoriesATOM():
 
         for category in categories:
             feed.add(category.name, unicode(category.name),
-                 content_type='html',
-                 author=category.name,
-                 url='',
-                 updated=category.date_modified,
-                 published=category.date_created)
+                     content_type='html',
+                     author=category.name,
+                     url='',
+                     updated=category.date_modified,
+                     published=category.date_created)
         return feed.get_response()
     except:
         flash('Error')
         return redirect(url_for('showHomepage'))
 
 
-# ######################################
-# Get Categories in XML Format
-# ######################################
+"""
+Get Categories in XML Format
+"""
+
+
 @app.route('/catalog/categories/XML')
 def viewCategoriesXML():
     try:
@@ -88,9 +103,11 @@ def viewCategoriesXML():
         return redirect(url_for('showHomepage'))
 
 
-# ######################################
-# Get Categories in RSS Format
-# ######################################
+"""
+Get Categories in RSS Format
+"""
+
+
 @app.route('/catalog/categories/RSS')
 def viewCategoriesRSS():
     try:
@@ -102,9 +119,11 @@ def viewCategoriesRSS():
         return redirect(url_for('showHomepage'))
 
 
-# ######################################
-# Get Category Items in JSON Format
-# ######################################
+"""
+Get Category Items in JSON Format
+"""
+
+
 @app.route('/catalog/<category_name>/JSON')
 def viewCategoryItemsJSON(category_name):
     try:

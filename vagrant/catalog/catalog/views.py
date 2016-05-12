@@ -38,8 +38,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-PER_PAGE = 20
-
 
 @app.route('/')
 @app.route('/catalog/')
@@ -56,7 +54,8 @@ def showHomepage():
         categories = session.query(Categories).order_by('name')
         items = session.query(Items).order_by('date_created')
 
-        return render_template('catalog.html', categories=categories, items=items, login_session=login_session)
+        return render_template('catalog.html', categories=categories,
+                               items=items, login_session=login_session)
     except:
         flash('Error')
         return render_template('/template.html')
@@ -85,7 +84,8 @@ def viewCategoryItems(category_name):
         flash('Error')
 
     return render_template('viewcategory.html', categories=categories,
-                           category=category, items=items, login_session=login_session)
+                           category=category, items=items,
+                           login_session=login_session)
 
 
 @app.route('/catalog/<category_name>/<item_title>/')
@@ -108,7 +108,8 @@ def viewLatestItems(category_name, item_title):
         items = session.query(Items).filter_by(category_id=category.id).\
             order_by('title')
 
-        item = session.query(Items).filter_by(category_id=category.id, title=item_title).one()
+        item = session.query(Items).filter_by(category_id=category.id,
+                                              title=item_title).one()
 
         creator = getUserInfo(item.user_id)
 
@@ -123,10 +124,7 @@ def viewLatestItems(category_name, item_title):
         flash('Error')
         return redirect(url_for('showHomepage'))
 
-# ######################################
-# Create a new Item
-# ######################################
-# Route with Method: GET and POST
+
 @app.route('/catalog/item/new', methods=['GET', 'POST'])
 def newItem():
     """
@@ -154,9 +152,14 @@ def newItem():
             category_id = form.category_id.data
             description = form.description.data
 
-            if form.title.data is not None and form.category_id.data is not None and form.category_id.data is not '0':
+            if (form.title.data is not None and
+                    form.category_id.data is not None and
+                    form.category_id.data is not '0'):
 
-                newItem = Items(title=title, description=description, category_id=category_id, user_id=login_session['user_id'])
+                newItem = Items(title=title,
+                                description=description,
+                                category_id=category_id,
+                                user_id=login_session['user_id'])
 
                 session.add(newItem)
                 session.commit()
@@ -165,7 +168,8 @@ def newItem():
             else:
                 flash("Missing required information for Add")
         else:
-            return render_template('newitem.html', form=form, login_session=login_session)
+            return render_template('newitem.html', form=form,
+                                   login_session=login_session)
     except:
         flash('Error')
     return redirect(url_for('showHomepage'))
@@ -190,21 +194,26 @@ def editItem(category_name, item_title):
 
         categories = session.query(Categories).order_by('name')
 
-        category = session.query(Categories).filter_by(name=category_name).one()
+        category = session.query(Categories)\
+                          .filter_by(name=category_name).one()
 
         if category is None:
             flash('Error unable to retrive category')
             return redirect(url_for('showHomepage'))
 
     except Exception as error:
-        # return '<script>function myFunction(){alert("caught this error-cat: %s");}</script><body onload="myFunction()">' % (repr(error))
+        output = '<script>function myFunction(){'
+        output += 'alert("caught this error-cat: %s");}</script>'
+        output += '<body onload="myFunction()">' % (repr(error))
+        # return output
 
         flash('Error cat')
         return redirect(url_for('showHomepage'))
 
     try:
 
-        item = session.query(Items).filter_by(title=item_title, category_id=category.id).one()
+        item = session.query(Items).filter_by(title=item_title,
+                                              category_id=category.id).one()
 
         if item is None:
             flash('Error unable to retrive item')
@@ -213,7 +222,10 @@ def editItem(category_name, item_title):
         item = session.query(Items).filter_by(id=item.id).one()
 
     except Exception as error:
-        # return '<script>function myFunction(){alert("caught this error-item: %s");}</script><body onload="myFunction()">' % (repr(error))
+        output = '<script>function myFunction(){'
+        output += 'alert("caught this error-item: %s");}</script>'
+        output += '<body onload="myFunction()">' % (repr(error))
+        # return output
 
         flash('Error item')
         return redirect(url_for('showHomepage'))
@@ -226,16 +238,21 @@ def editItem(category_name, item_title):
 
         form.category_id.choices = [(0, 'Select')]
         form.category_id.choices += [(cat.id, cat.name) for
-                                 cat in categories]
+                                     cat in categories]
 
         print form.errors
 
+        """
+        Validate form on submit
+        Gather user inputs and update the database
+        """
         if form.validate_on_submit():
             form.populate_obj(item)
 
             item.title = form.title.data
             item.description = form.description.data
             item.category_id = form.category_id.data
+            item.user_id = creator.id
 
             session.add(item)
             session.commit()
@@ -243,20 +260,21 @@ def editItem(category_name, item_title):
             flash("Successfully updated item")
             return redirect(url_for('showHomepage'))
 
-
         return render_template('edititem.html',
-            form=form,
-            categories=categories,
-            category=category,
-            creator=creator,
-            login_session=login_session)
+                               form=form,
+                               categories=categories,
+                               category=category,
+                               creator=creator,
+                               login_session=login_session)
 
     except Exception as error:
-        # return '<script>function myFunction(){alert("caught this error-2: %s");}</script><body onload="myFunction()">' % (repr(error))
+        output = '<script>function myFunction(){'
+        output += 'alert("caught this error-2: %s");}</script>'
+        output += '<body onload="myFunction()">' % (repr(error))
+        # return output
 
         flash('Error 2')
         return redirect(url_for('showHomepage'))
-
 
 
 @app.route('/catalog/<category_name>/<item_title>/delete',
@@ -268,7 +286,8 @@ def deleteItem(category_name, item_title):
         category_name (data type: str): category name to filter result
         item_title (data type: str): item name to filter result
     Returns:
-        return delete a item and redirect to home or show form to confirm a delete item
+        return delete a item and redirect to home or show form to confirm a
+        delete item
     """
 
     if 'username' not in login_session:
@@ -277,7 +296,8 @@ def deleteItem(category_name, item_title):
     category = session.query(Categories).filter_by(name=category_name).\
         one()
 
-    item = session.query(Items).filter_by(title=item_title, category_id=category.id).one()
+    item = session.query(Items).filter_by(title=item_title,
+                                          category_id=category.id).one()
 
     if item:
 
@@ -294,19 +314,27 @@ def deleteItem(category_name, item_title):
         return redirect(url_for('showHomepage'))
 
 
-# ######################################
-# Create anti-forgery state token
-# ######################################
 def getReqState():
+    """
+    getReqState: set login session state value
+    Create anti-forgery state token
+    Args:
+        None
+    Returns:
+    """
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
 
 
-# ######################################
-# Create User from login_session
-# ######################################
 def createUser(login_session):
+    """
+    createUser: create user after successful login
+    Args:
+        login_session
+    Returns:
+        user.id
+    """
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -315,11 +343,14 @@ def createUser(login_session):
     return user.id
 
 
-# ######################################
-# Get User Info
-# ######################################
-# param (int) user_id
 def getUserInfo(user_id):
+    """
+    getUserInfo: get user information
+    Args:
+        user_id
+    Returns:
+        None or user row
+    """
     try:
         user = session.query(User).filter_by(id=user_id).one()
         return user
@@ -332,6 +363,13 @@ def getUserInfo(user_id):
 # ######################################
 # param (string) email
 def getUserID(email):
+    """
+    getUserID: get user information
+    Args:
+        email
+    Returns:
+        None or user.id
+    """
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -341,6 +379,7 @@ def getUserID(email):
 # ######################################
 # Website Authentication
 # ######################################
+
 
 @app.route('/login')
 def showLogin():
@@ -353,17 +392,21 @@ def showLogin():
     """
     getReqState()
 
-    AMZ_CLIENT_ID = json.loads(open('instance/amz_client_secrets.json', 'r').read())[
-        'web']['client_id']
+    AMZ_CLIENT_ID = json.loads(open('instance/amz_client_secrets.json', 'r').
+                               read())['web']['client_id']
 
-    FB_APP_ID = json.loads(open('instance/fb_client_secrets.json', 'r').read())[
-        'web']['app_id']
+    FB_APP_ID = json.loads(open('instance/fb_client_secrets.json', 'r').
+                           read())['web']['app_id']
 
-    G_CLIENT_ID = json.loads(open('instance/g_client_secrets.json', 'r').read())[
-        'web']['client_id']
+    G_CLIENT_ID = json.loads(open('instance/g_client_secrets.json', 'r').
+                             read())['web']['client_id']
 
     # return "The current session state is %s" % login_session['state']
-    return render_template('login.html', STATE=login_session['state'], AMZ_CLIENT_ID=AMZ_CLIENT_ID, FB_APP_ID=FB_APP_ID, G_CLIENT_ID=G_CLIENT_ID)
+    return render_template('login.html',
+                           STATE=login_session['state'],
+                           AMZ_CLIENT_ID=AMZ_CLIENT_ID,
+                           FB_APP_ID=FB_APP_ID,
+                           G_CLIENT_ID=G_CLIENT_ID)
 
 
 # ######################################
@@ -387,10 +430,12 @@ def fbconnect():
 
     app_id = json.loads(open('instance/fb_client_secrets.json', 'r').read())[
         'web']['app_id']
-    app_secret = json.loads(
-        open('instance/fb_client_secrets.json', 'r').read())['web']['app_secret']
+    app_secret = json.loads(open('instance/fb_client_secrets.json', 'r').
+                            read())['web']['app_secret']
 
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type='
+    url += 'fb_exchange_token&client_id=%s&client_secret=%s&'
+    url += 'fb_exchange_token=%s' % (
         app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -400,7 +445,6 @@ def fbconnect():
     # strip expire tag from access token
     token = result.split("&")[0]
 
-
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
@@ -409,7 +453,8 @@ def fbconnect():
 
     # if error is
     # API calls from the server require an appsecret_proof argument
-    # http://stackoverflow.com/questions/22359611/api-calls-from-the-server-require-an-appsecret-proof-argument
+    # http://stackoverflow.com/questions/22359611/api-calls-from-the-server-
+    # require-an-appsecret-proof-argument
 
     data = json.loads(result)
 
@@ -419,12 +464,15 @@ def fbconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
-    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    # The token must be stored in the login_session in order to properly
+    # logout, let's strip out the information before the equals
+    # sign in our token
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200'
+    url += '&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -444,7 +492,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: '
+    output += '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -463,7 +512,8 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s'
+    url += '' % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
@@ -480,11 +530,12 @@ def gconnect():
     code = request.data
 
     try:
-        G_CLIENT_ID = json.loads(open('instance/g_client_secrets.json', 'r').read())[
-            'web']['client_id']
+        G_CLIENT_ID = json.loads(open('instance/g_client_secrets.json', 'r').
+                                 read())['web']['client_id']
 
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('instance/g_client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets('instance/g_client_secrets.json',
+                                             scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -512,9 +563,6 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
-
-
     # Verify that the access token is valid for this app.
     if result['issued_to'] != G_CLIENT_ID:
         response = make_response(
@@ -526,8 +574,8 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps('Current user is already '
+                                            'connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -560,7 +608,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: '
+    output += '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -601,25 +650,26 @@ def amzconnect():
 
     access_token = request.data
 
-    app_id = json.loads(open('instance/amz_client_secrets.json', 'r').read())[
-        'web']['app_id']
-    client_id = json.loads(open('instance/amz_client_secrets.json', 'r').read())[
-        'web']['client_id']
-    client_secret = json.loads(
-        open('instance/amz_client_secrets.json', 'r').read())['web']['client_secret']
+    app_id = json.loads(open('instance/amz_client_secrets.json', 'r').
+                        read())['web']['app_id']
+    client_id = json.loads(open('instance/amz_client_secrets.json', 'r').
+                           read())['web']['client_id']
+    client_secret = json.loads(open('instance/amz_client_secrets.json', 'r').
+                               read())['web']['client_secret']
 
     b = StringIO.StringIO()
 
     # verify that the access token belongs to us
     c = pycurl.Curl()
-    c.setopt(pycurl.URL, "https://api.amazon.com/auth/o2/tokeninfo?access_token=" + urllib.quote_plus(access_token))
+    c.setopt(pycurl.URL, "https://api.amazon.com/auth/o2/tokeninfo?"
+                         "access_token=" + urllib.quote_plus(access_token))
     c.setopt(pycurl.SSL_VERIFYPEER, 0)
     c.setopt(pycurl.WRITEFUNCTION, b.write)
 
     c.perform()
     d = json.loads(b.getvalue())
 
-    if d['aud'] != client_id :
+    if d['aud'] != client_id:
         # the access token does not belong to us
         raise BaseException("Invalid Token")
 
@@ -658,7 +708,8 @@ def amzconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: '
+    output += '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -673,7 +724,8 @@ def amzdisconnect():
     amazon_id = login_session['amazon_id']
     # The access token must me included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://api.amazon.com/auth/o2/tokeninfo?access_token=%s' % (access_token)
+    url = 'https://api.amazon.com/auth/o2/tokeninfo?access_token=%s'
+    url += '' % (access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
 

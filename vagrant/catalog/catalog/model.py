@@ -11,6 +11,11 @@ from . import app
 
 Base = declarative_base()
 
+"""
+Define User model Class
+"""
+
+
 class User(Base):
     __tablename__ = 'user'
 
@@ -18,6 +23,10 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
     picture = Column(String)
+
+"""
+Define Categories model Class
+"""
 
 
 class Categories(Base):
@@ -27,12 +36,20 @@ class Categories(Base):
     date_created = Column(DateTime, default=datetime.datetime.utcnow)
     date_modified = Column(DateTime, default=datetime.datetime.utcnow)
 
+    """
+    serialize Categories model for json and other usage
+    """
     @property
     def serialize(self):
         return {
             'id': self.id,
             'name': self.name,
         }
+
+"""
+Define Items model Class
+"""
+
 
 class Items(Base):
     __tablename__ = 'items'
@@ -46,6 +63,9 @@ class Items(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    """
+    serialize Items model for json and other usage
+    """
     @property
     def serialize(self):
         return {
@@ -55,9 +75,14 @@ class Items(Base):
             'category_id': self.category_id,
         }
 
-
-
+"""
+Set engine variable with create_engine method to database file
+"""
 # engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 engine = create_engine('sqlite:///itemcatalog.db')
 
+"""
+Call base metadata create_all method
+Args: engine
+"""
 Base.metadata.create_all(engine)

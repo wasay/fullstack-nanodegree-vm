@@ -8,13 +8,15 @@ app.config.from_object('config.default')
 # Load the configuration from the instance folder
 app.config.from_pyfile('config.py')
 
-# Load the file specified by the APP_CONFIG_FILE environment variable
-# Variables defined here will override those in the default configuration
-# app.config.from_envvar('APP_CONFIG_FILE')
 
-# import catalog.init_data
-
-
+"""
+    import files into the application
+    catalog: class mapping to database objects
+    forms: database add/update forms
+    model: database model
+    views: all views
+    webapi: JSON Calls
+"""
 import catalog
 import forms
 import model
